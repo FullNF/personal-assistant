@@ -39,7 +39,7 @@ if _SOURCE_COOKIES_FILE and os.path.exists(_SOURCE_COOKIES_FILE):
 # With real account cookies, the plain "web" client behaves like a logged-in
 # browser and avoids the bot check. Without cookies, fall back to android/ios
 # which historically skip that check on cloud/datacenter IPs.
-EXTRACTOR_ARGS = {"youtube": {"player_client": ["web", "android", "ios"] if COOKIES_FILE else ["android", "ios", "web"]}}
+EXTRACTOR_ARGS = {"youtube": {"player_client": ["web", "android", "ios", "android_vr", "tv"] if COOKIES_FILE else ["android_vr", "android", "ios", "tv", "web"]}}
 
 
 def safe_filename(name: str) -> str:
