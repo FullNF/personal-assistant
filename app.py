@@ -15,8 +15,14 @@ app = Flask(__name__, static_folder="static", static_url_path="")
 # CORS(app, resources={r"/api/*": {"origins": "https://your-app.vercel.app"}})
 CORS(app, resources={r"/api/*": {"origins": os.environ.get("ALLOWED_ORIGIN", "*")}})
 
-DOWNLOAD_ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "downloads")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DOWNLOAD_ROOT = os.path.join(BASE_DIR, "downloads")
 os.makedirs(DOWNLOAD_ROOT, exist_ok=True)
+
+# On hosts without a system ffmpeg (e.g. Render's Python runtime), the build
+# step downloads a static ffmpeg/ffprobe binary next to this file.
+_LOCAL_FFMPEG = os.path.join(BASE_DIR, "ffmpeg")
+FFMPEG_LOCATION = BASE_DIR if os.path.exists(_LOCAL_FFMPEG) else None
 
 
 def safe_filename(name: str) -> str:
@@ -47,6 +53,8 @@ def info():
         "skip_download": True,
         "noplaylist": True,
     }
+    if FFMPEG_LOCATION:
+        ydl_opts["ffmpeg_location"] = FFMPEG_LOCATION
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             result = ydl.extract_info(url, download=False)
@@ -121,6 +129,8 @@ def download():
         "outtmpl": outtmpl,
         "restrictfilenames": False,
     }
+    if FFMPEG_LOCATION:
+        ydl_opts["ffmpeg_location"] = FFMPEG_LOCATION
 
     if mode == "mp3":
         ydl_opts["format"] = "bestaudio/best"
