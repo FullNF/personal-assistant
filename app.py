@@ -24,6 +24,12 @@ os.makedirs(DOWNLOAD_ROOT, exist_ok=True)
 _LOCAL_FFMPEG = os.path.join(BASE_DIR, "ffmpeg")
 FFMPEG_LOCATION = BASE_DIR if os.path.exists(_LOCAL_FFMPEG) else None
 
+# Cloud/datacenter IPs (Render, AWS, etc.) are frequently bot-checked by
+# YouTube on the default web client. The android/ios player clients skip
+# that check for most videos.
+EXTRACTOR_ARGS = {"youtube": {"player_client": ["android", "ios", "web"]}}
+COOKIES_FILE = os.environ.get("YTDLP_COOKIES_FILE")
+
 
 def safe_filename(name: str) -> str:
     name = re.sub(r'[\\/:*?"<>|]', "_", name).strip()
@@ -52,9 +58,12 @@ def info():
         "no_warnings": True,
         "skip_download": True,
         "noplaylist": True,
+        "extractor_args": EXTRACTOR_ARGS,
     }
     if FFMPEG_LOCATION:
         ydl_opts["ffmpeg_location"] = FFMPEG_LOCATION
+    if COOKIES_FILE:
+        ydl_opts["cookiefile"] = COOKIES_FILE
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             result = ydl.extract_info(url, download=False)
@@ -128,9 +137,12 @@ def download():
         "noplaylist": True,
         "outtmpl": outtmpl,
         "restrictfilenames": False,
+        "extractor_args": EXTRACTOR_ARGS,
     }
     if FFMPEG_LOCATION:
         ydl_opts["ffmpeg_location"] = FFMPEG_LOCATION
+    if COOKIES_FILE:
+        ydl_opts["cookiefile"] = COOKIES_FILE
 
     if mode == "mp3":
         ydl_opts["format"] = "bestaudio/best"
