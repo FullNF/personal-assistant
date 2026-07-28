@@ -57,18 +57,6 @@ def health():
     return jsonify({"status": "ok"})
 
 
-@app.route("/api/debug")
-def debug():
-    info = {
-        "ffmpeg_location": FFMPEG_LOCATION,
-        "source_cookies_env": _SOURCE_COOKIES_FILE,
-        "source_cookies_exists": bool(_SOURCE_COOKIES_FILE and os.path.exists(_SOURCE_COOKIES_FILE)),
-        "cookies_file": COOKIES_FILE,
-        "cookies_file_exists": bool(COOKIES_FILE and os.path.exists(COOKIES_FILE)),
-        "cookies_file_size": os.path.getsize(COOKIES_FILE) if COOKIES_FILE and os.path.exists(COOKIES_FILE) else 0,
-        "yt_dlp_version": yt_dlp.version.__version__,
-    }
-    return jsonify(info)
 
 
 @app.route("/api/info", methods=["POST"])
