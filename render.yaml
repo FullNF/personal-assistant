@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: ytdownloader-backend
+    runtime: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn -w 2 -t 120 app:app"
+    aptPackages:
+      - ffmpeg
+    envVars:
+      - key: ALLOWED_ORIGIN
+        value: "*"
