@@ -2,3 +2,6 @@ downloads/
 __pycache__/
 *.pyc
 server.log
+cookies_runtime.txt
+ffmpeg
+ffprobe

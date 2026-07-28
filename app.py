@@ -28,7 +28,15 @@ FFMPEG_LOCATION = BASE_DIR if os.path.exists(_LOCAL_FFMPEG) else None
 # YouTube on the default web client. The android/ios player clients skip
 # that check for most videos.
 EXTRACTOR_ARGS = {"youtube": {"player_client": ["android", "ios", "web"]}}
-COOKIES_FILE = os.environ.get("YTDLP_COOKIES_FILE")
+
+# yt-dlp rewrites the cookie jar in place (updated expiry/session values), so
+# a read-only mount (e.g. Render's /etc/secrets) must be copied to a writable
+# path first.
+_SOURCE_COOKIES_FILE = os.environ.get("YTDLP_COOKIES_FILE")
+COOKIES_FILE = None
+if _SOURCE_COOKIES_FILE and os.path.exists(_SOURCE_COOKIES_FILE):
+    COOKIES_FILE = os.path.join(BASE_DIR, "cookies_runtime.txt")
+    shutil.copyfile(_SOURCE_COOKIES_FILE, COOKIES_FILE)
 
 
 def safe_filename(name: str) -> str:
