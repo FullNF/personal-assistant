@@ -27,8 +27,6 @@ FFMPEG_LOCATION = BASE_DIR if os.path.exists(_LOCAL_FFMPEG) else None
 # Cloud/datacenter IPs (Render, AWS, etc.) are frequently bot-checked by
 # YouTube on the default web client. The android/ios player clients skip
 # that check for most videos.
-EXTRACTOR_ARGS = {"youtube": {"player_client": ["android", "ios", "web"]}}
-
 # yt-dlp rewrites the cookie jar in place (updated expiry/session values), so
 # a read-only mount (e.g. Render's /etc/secrets) must be copied to a writable
 # path first.
@@ -37,6 +35,11 @@ COOKIES_FILE = None
 if _SOURCE_COOKIES_FILE and os.path.exists(_SOURCE_COOKIES_FILE):
     COOKIES_FILE = os.path.join(BASE_DIR, "cookies_runtime.txt")
     shutil.copyfile(_SOURCE_COOKIES_FILE, COOKIES_FILE)
+
+# With real account cookies, the plain "web" client behaves like a logged-in
+# browser and avoids the bot check. Without cookies, fall back to android/ios
+# which historically skip that check on cloud/datacenter IPs.
+EXTRACTOR_ARGS = {"youtube": {"player_client": ["web"] if COOKIES_FILE else ["android", "ios", "web"]}}
 
 
 def safe_filename(name: str) -> str:
